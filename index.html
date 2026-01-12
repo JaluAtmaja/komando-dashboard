@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Komando</title>
+  <title>Komando Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="./style.css">
 </head>
@@ -10,6 +10,7 @@
 
 <div class="app">
 
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="logo">Komando</div>
     <nav>
@@ -19,43 +20,68 @@
     </nav>
   </aside>
 
+  <!-- MAIN -->
   <main class="main">
-    
+
     <!-- DASHBOARD -->
     <section id="dashboard" class="page active">
-      <h1>Dashboard</h1>
-      <div class="cards">
-        <div class="card">Total Sites<br><strong>3</strong></div>
-        <div class="card">Posts<br><strong>12</strong></div>
-        <div class="card">Status<br><strong>Active</strong></div>
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <span class="subtitle">Overview & activity</span>
+      </div>
+
+      <div class="stats">
+        <div class="stat-card">
+          <span>Total Sites</span>
+          <strong>3</strong>
+        </div>
+        <div class="stat-card">
+          <span>Posts</span>
+          <strong>12</strong>
+        </div>
+        <div class="stat-card">
+          <span>Status</span>
+          <strong>Active</strong>
+        </div>
       </div>
     </section>
 
     <!-- SITES -->
     <section id="sites" class="page">
-      <h1>Sites</h1>
+      <div class="page-header">
+        <h1>Sites</h1>
+        <span class="subtitle">Manage connected websites</span>
+      </div>
+
       <table>
-        <tr>
-          <th>Site</th>
-          <th>Status</th>
-        </tr>
-        <tr>
-          <td>example.com</td>
-          <td>Connected</td>
-        </tr>
+        <thead>
+          <tr>
+            <th>Site</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>example.com</td>
+            <td><span class="badge active">Connected</span></td>
+          </tr>
+        </tbody>
       </table>
     </section>
 
     <!-- PUBLISH -->
     <section id="publish" class="page">
-      <h1>Publish</h1>
+      <div class="page-header">
+        <h1>Publish</h1>
+        <span class="subtitle">Create & publish post</span>
+      </div>
+
       <input type="text" placeholder="Post title">
       <textarea placeholder="Post content"></textarea>
       <button>Publish</button>
     </section>
 
   </main>
-
 </div>
 
 <script src="./script.js"></script>
