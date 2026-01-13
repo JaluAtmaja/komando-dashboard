@@ -7,60 +7,57 @@ const pages = document.querySelectorAll(".page");
 links.forEach(link => {
   link.addEventListener("click", e => {
     e.preventDefault();
-
     links.forEach(l => l.classList.remove("active"));
     pages.forEach(p => p.classList.remove("active"));
-
     link.classList.add("active");
     document.getElementById(link.dataset.page).classList.add("active");
   });
 });
 
 /*********************
- * CONFIG API WORKER
+ * CONFIG
  *********************/
-const API_URL = "https://komando-api.jalu-atmaja88.workers.dev";
-// ⚠️ GANTI dengan URL Worker Anda yang ASLI
+const API_URL = "https://komando-api.yourname.workers.dev"; // GANTI
 
 /*********************
- * PUBLISH TO WORDPRESS
+ * ADD SITE
  *********************/
-const publishBtn = document.getElementById("publishBtn");
+const addSiteBtn = document.getElementById("addSiteBtn");
+const siteStatus = document.getElementById("siteStatus");
+const sitesTable = document.querySelector("#sitesTable tbody");
 
-if (publishBtn) {
-  publishBtn.addEventListener("click", async () => {
-    const title = document.getElementById("wp-title").value;
-    const content = document.getElementById("wp-content").value;
-    const statusEl = document.getElementById("publishStatus");
+if (addSiteBtn) {
+  addSiteBtn.addEventListener("click", async () => {
+    const data = {
+      name: document.getElementById("site-name").value,
+      url: document.getElementById("site-url").value,
+      user: document.getElementById("site-user").value,
+      pass: document.getElementById("site-pass").value
+    };
 
-    if (!title || !content) {
-      statusEl.textContent = "❌ Title dan content wajib diisi";
-      return;
-    }
-
-    statusEl.textContent = "⏳ Publishing...";
+    siteStatus.textContent = "⏳ Adding site...";
 
     try {
-      const res = await fetch(`${API_URL}/publish`, {
+      const res = await fetch(`${API_URL}/add-site`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          title,
-          content
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
       });
 
-      if (!res.ok) throw new Error("Publish failed");
+      if (!res.ok) throw new Error();
 
-      statusEl.textContent = "✅ Post berhasil dipublish";
-      document.getElementById("wp-title").value = "";
-      document.getElementById("wp-content").value = "";
+      const result = await res.json();
 
-    } catch (err) {
-      statusEl.textContent = "❌ Gagal publish ke WordPress";
-      console.error(err);
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${data.name}</td>
+        <td><span class="badge active">Connected</span></td>
+      `;
+      sitesTable.appendChild(row);
+
+      siteStatus.textContent = "✅ Site added";
+    } catch {
+      siteStatus.textContent = "❌ Failed to add site";
     }
   });
 }
