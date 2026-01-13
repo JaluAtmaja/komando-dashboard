@@ -1,128 +1,127 @@
 const API = "https://komando-api.jalu-atmaja88.workers.dev";
 
-/*****************
+let generatedArticles = [];
+
+/* =====================
  NAVIGATION
-*****************/
-const links = document.querySelectorAll(".sidebar a");
-const pages = document.querySelectorAll(".page");
-
-links.forEach(link => {
-  link.addEventListener("click", e => {
+===================== */
+document.querySelectorAll(".sidebar a").forEach(link => {
+  link.onclick = e => {
     e.preventDefault();
-
-    links.forEach(l => l.classList.remove("active"));
-    pages.forEach(p => p.classList.remove("active"));
-
+    document.querySelectorAll(".sidebar a").forEach(a => a.classList.remove("active"));
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     link.classList.add("active");
-    const pageId = link.dataset.page;
-    document.getElementById(pageId).classList.add("active");
-
-    if (pageId === "sites") {
-      loadSites();
-    }
-  });
+    document.getElementById(link.dataset.page).classList.add("active");
+  };
 });
 
-/*****************
+/* =====================
  LOAD SITES
-*****************/
+===================== */
 async function loadSites() {
-  const table = document.getElementById("sitesTable");
-  table.innerHTML = "";
-
   const res = await fetch(`${API}/sites`);
   const sites = await res.json();
 
-  sites.forEach(site => {
-    const row = document.createElement("tr");
+  const select = document.getElementById("siteSelect");
+  select.innerHTML = "";
 
-    row.innerHTML = `
-      <td>${site.url}</td>
-      <td>Connected</td>
-      <td>
-        <button onclick="deleteSite('${site.id}')">Hapus</button>
-      </td>
-    `;
-
-    table.appendChild(row);
+  sites.forEach(s => {
+    select.innerHTML += `<option value="${s.id}">${s.url}</option>`;
   });
-
-  // update dashboard counter
-  document.querySelector(".stat-card strong").textContent = sites.length;
 }
 
-/*****************
- ADD SITE
-*****************/
-document.getElementById("addSiteBtn").addEventListener("click", async () => {
-  const url = document.getElementById("site-url").value;
-  const user = document.getElementById("site-user").value;
-  const pass = document.getElementById("site-pass").value;
-  const status = document.getElementById("siteStatus");
+/* =====================
+ LOAD CATEGORIES
+===================== */
+async function loadCategories(siteId) {
+  const res = await fetch(`${API}/categories?siteId=${siteId}`);
+  const cats = await res.json();
 
-  if (!url || !user || !pass) {
-    status.textContent = "❌ Lengkapi semua field";
-    return;
-  }
+  const select = document.getElementById("categorySelect");
+  select.innerHTML = "";
 
-  status.textContent = "⏳ Menambahkan site...";
+  cats.forEach(c => {
+    select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+  });
+}
 
-  const res = await fetch(`${API}/add-site`, {
+document.getElementById("siteSelect").onchange = e => {
+  loadCategories(e.target.value);
+};
+
+/* =====================
+ GENERATE AI
+===================== */
+document.getElementById("generateBtn").onclick = async () => {
+  const res = await fetch(`${API}/generate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ url, user, pass })
+    body: JSON.stringify({
+      title: baseTitle.value,
+      content: baseContent.value,
+      count: articleCount.value
+    })
   });
 
-  if (!res.ok) {
-    status.textContent = "❌ Site sudah ada / gagal";
-    return;
+  const data = await res.json();
+  generatedArticles = data.articles;
+
+  const list = document.getElementById("generatedList");
+  const select = document.getElementById("articleSelect");
+
+  list.innerHTML = "";
+  select.innerHTML = "";
+
+  generatedArticles.forEach((a, i) => {
+    list.innerHTML += `
+      <div class="article-preview">
+        <strong>${a.title}</strong>
+        <p>${a.content.substring(0, 150)}...</p>
+      </div>
+    `;
+    select.innerHTML += `<option value="${i}">Artikel ${i + 1}</option>`;
+  });
+};
+
+/* =====================
+ PUBLISH
+===================== */
+document.getElementById("publishBtn").onclick = async () => {
+  const article = generatedArticles[articleSelect.value];
+  const file = imageInput.files[0];
+
+  let mediaId = null;
+
+  if (file) {
+    const form = new FormData();
+    form.append("file", file);
+
+    const img = await fetch(`${API}/upload-image?siteId=${siteSelect.value}`, {
+      method: "POST",
+      body: form
+    });
+
+    const imgData = await img.json();
+    mediaId = imgData.mediaId;
   }
-
-  status.textContent = "✅ Site berhasil ditambahkan";
-
-  // reload list
-  loadSites();
-});
-
-/*****************
- PUBLISH POST
-*****************/
-document.getElementById("publishBtn").addEventListener("click", async () => {
-  const title = document.getElementById("post-title").value;
-  const content = document.getElementById("post-content").value;
-  const status = document.getElementById("publishStatus");
-
-  if (!title || !content) {
-    status.textContent = "❌ Judul & konten wajib diisi";
-    return;
-  }
-
-  status.textContent = "⏳ Publishing...";
 
   const res = await fetch(`${API}/publish`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title, content })
+    body: JSON.stringify({
+      siteId: siteSelect.value,
+      title: article.title,
+      content: article.content,
+      category: categorySelect.value,
+      featuredImage: mediaId
+    })
   });
 
-  if (res.ok) {
-    status.textContent = "✅ Post berhasil dipublish";
-  } else {
-    status.textContent = "❌ Gagal publish";
-  }
-});
+  const data = await res.json();
+  publishStatus.innerHTML = `✅ <a href="${data.link}" target="_blank">Lihat Artikel</a>`;
+};
 
-/*****************
- AUTO LOAD ON START
-*****************/
+/* =====================
+ INIT
+===================== */
 loadSites();
-async function deleteSite(id) {
-  if (!confirm("Yakin ingin menghapus site ini?")) return;
-
-  await fetch(`${API}/delete-site?id=${id}`, {
-    method: "DELETE"
-  });
-
-  loadSites();
-}
-
