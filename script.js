@@ -1,3 +1,5 @@
+const API = "https://komando-api.jalu-atmaja88.workers.dev";
+
 /*****************
  NAVIGATION
 *****************/
@@ -15,70 +17,45 @@ links.forEach(link => {
 });
 
 /*****************
- CONFIG
+ LOAD SITES (ON PAGE LOAD)
 *****************/
-// GANTI DENGAN URL WORKER ANDA
-const API_URL = "https://komando-api.jalu-atmaja88.workers.dev";
+async function loadSites() {
+  const res = await fetch(`${API}/sites`);
+  const sites = await res.json();
 
-/*****************
- ADD SITE (LOCAL UI)
-*****************/
-const addBtn = document.getElementById("addSiteBtn");
-const table = document.getElementById("sitesTable");
-const siteStatus = document.getElementById("siteStatus");
+  const table = document.getElementById("sitesTable");
+  table.innerHTML = "";
 
-if (addBtn) {
-  addBtn.addEventListener("click", () => {
-    const name = document.getElementById("site-name").value;
-
-    if (!name) {
-      siteStatus.textContent = "❌ Site name required";
-      return;
-    }
-
+  sites.forEach(site => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${name}</td>
+      <td>${site.url}</td>
       <td>Connected</td>
     `;
     table.appendChild(row);
-
-    siteStatus.textContent = "✅ Site added";
   });
 }
+
+window.addEventListener("load", loadSites);
 
 /*****************
- PUBLISH POST
+ ADD SITE (API)
 *****************/
-const publishBtn = document.getElementById("publishBtn");
-const publishStatus = document.getElementById("publishStatus");
+document.getElementById("addSiteBtn").addEventListener("click", async () => {
+  const url = document.getElementById("site-url").value;
+  const user = document.getElementById("site-user").value;
+  const pass = document.getElementById("site-pass").value;
 
-if (publishBtn) {
-  publishBtn.addEventListener("click", async () => {
-    const title = document.getElementById("post-title").value;
-    const content = document.getElementById("post-content").value;
+  if (!url || !user || !pass) {
+    alert("Lengkapi semua field");
+    return;
+  }
 
-    if (!title || !content) {
-      publishStatus.textContent = "❌ Title & content required";
-      return;
-    }
-
-    publishStatus.textContent = "⏳ Publishing...";
-
-    try {
-      const res = await fetch(`${API_URL}/publish`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ title, content })
-      });
-
-      if (!res.ok) throw new Error();
-
-      publishStatus.textContent = "✅ Published!";
-    } catch (err) {
-      publishStatus.textContent = "❌ Publish failed";
-    }
+  await fetch(`${API}/add-site`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url, user, pass })
   });
-}
+
+  loadSites(); // reload table
+});
