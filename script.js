@@ -19,24 +19,32 @@ links.forEach(link => {
 /*****************
  LOAD SITES (ON PAGE LOAD)
 *****************/
-async function loadSites() {
-  const res = await fetch(`${API}/sites`);
-  const sites = await res.json();
+document.getElementById("publishBtn").addEventListener("click", async () => {
+  const siteId = document.getElementById("siteSelect").value;
+  const title = document.getElementById("postTitle").value;
+  const content = document.getElementById("postContent").value;
+  const status = document.getElementById("publishStatus");
 
-  const table = document.getElementById("sitesTable");
-  table.innerHTML = "";
+  if (!siteId || !title || !content) {
+    status.textContent = "❌ Lengkapi semua field";
+    return;
+  }
 
-  sites.forEach(site => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${site.url}</td>
-      <td>Connected</td>
-    `;
-    table.appendChild(row);
+  status.textContent = "⏳ Publishing...";
+
+  const res = await fetch(`${API}/publish`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ siteId, title, content })
   });
-}
 
-window.addEventListener("load", loadSites);
+  if (res.ok) {
+    status.textContent = "✅ Post berhasil dipublish";
+  } else {
+    status.textContent = "❌ Gagal publish";
+  }
+});
+
 
 /*****************
  ADD SITE (API)
