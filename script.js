@@ -30,22 +30,27 @@ async function loadSites() {
   const table = document.getElementById("sitesTable");
   table.innerHTML = "";
 
-  const res = await fetch(`${API}/sites`);
-  const sites = await res.json();
+  try {
+    const res = await fetch(`${API}/sites`);
+    const sites = await res.json();
 
-  sites.forEach(site => {
-    const row = document.createElement("tr");
+    sites.forEach(site => {
+      const row = document.createElement("tr");
 
-    row.innerHTML = `
-      <td>${site.url}</td>
-      <td>Connected</td>
-      <td>
-        <button onclick="deleteSite('${site.id}')">Hapus</button>
-      </td>
-    `;
+      row.innerHTML = `
+        <td>${site.url}</td>
+        <td>Connected</td>
+      `;
 
-    table.appendChild(row);
-  });
+      table.appendChild(row);
+    });
+
+    // update dashboard count
+    document.querySelector(".stat-card strong").textContent = sites.length;
+
+  } catch (err) {
+    console.error("Gagal load sites", err);
+  }
 }
 
 /*****************
@@ -55,34 +60,61 @@ document.getElementById("addSiteBtn").addEventListener("click", async () => {
   const url = document.getElementById("site-url").value;
   const user = document.getElementById("site-user").value;
   const pass = document.getElementById("site-pass").value;
+  const status = document.getElementById("siteStatus");
 
   if (!url || !user || !pass) {
-    alert("Lengkapi semua field");
+    status.textContent = "❌ Lengkapi semua field";
     return;
   }
 
-  await fetch(`${API}/add-site`, {
+  status.textContent = "⏳ Menambahkan site...";
+
+  const res = await fetch(`${API}/add-site`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ url, user, pass })
   });
 
-  document.getElementById("site-url").value = "";
-  document.getElementById("site-user").value = "";
-  document.getElementById("site-pass").value = "";
+  if (!res.ok) {
+    status.textContent = "❌ Site sudah ada / gagal";
+    return;
+  }
 
+  status.textContent = "✅ Site berhasil ditambahkan";
+
+  // reload list
   loadSites();
 });
 
 /*****************
- DELETE SITE
+ PUBLISH POST
 *****************/
-async function deleteSite(id) {
-  if (!confirm("Hapus site ini?")) return;
+document.getElementById("publishBtn").addEventListener("click", async () => {
+  const title = document.getElementById("post-title").value;
+  const content = document.getElementById("post-content").value;
+  const status = document.getElementById("publishStatus");
 
-  await fetch(`${API}/delete-site?id=${id}`, {
-    method: "DELETE"
+  if (!title || !content) {
+    status.textContent = "❌ Judul & konten wajib diisi";
+    return;
+  }
+
+  status.textContent = "⏳ Publishing...";
+
+  const res = await fetch(`${API}/publish`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title, content })
   });
 
-  loadSites();
-}
+  if (res.ok) {
+    status.textContent = "✅ Post berhasil dipublish";
+  } else {
+    status.textContent = "❌ Gagal publish";
+  }
+});
+
+/*****************
+ AUTO LOAD ON START
+*****************/
+loadSites();
