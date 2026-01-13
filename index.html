@@ -25,38 +25,46 @@
 
     <!-- DASHBOARD -->
     <section id="dashboard" class="page active">
-      <div class="page-header">
-        <h1>Dashboard</h1>
-        <span class="subtitle">Overview & activity</span>
-      </div>
-
+      <h1>Dashboard</h1>
       <div class="stats">
-        <div class="stat-card">
-          <span>Total Sites</span>
-          <strong>3</strong>
-        </div>
-        <div class="stat-card">
-          <span>Posts</span>
-          <strong>12</strong>
-        </div>
-        <div class="stat-card">
-          <span>Status</span>
-          <strong>Active</strong>
-        </div>
+        <div class="stat-card">Total Sites<br><strong>0</strong></div>
+        <div class="stat-card">Posts<br><strong>0</strong></div>
+        <div class="stat-card">Status<br><strong>Active</strong></div>
       </div>
     </section>
 
     <!-- SITES -->
-    <!-- PUBLISH -->
-    <section id="publish" class="page">
-      <div class="page-header">
-        <h1>Publish</h1>
-        <span class="subtitle">Create & publish post</span>
+    <section id="sites" class="page">
+      <h1>WordPress Sites</h1>
+
+      <div class="form">
+        <input id="site-name" type="text" placeholder="Site Name">
+        <input id="site-url" type="text" placeholder="WordPress URL">
+        <input id="site-user" type="text" placeholder="Username">
+        <input id="site-pass" type="password" placeholder="Application Password">
+        <button id="addSiteBtn">Add Site</button>
       </div>
 
-      <input type="text" placeholder="Post title">
-      <textarea placeholder="Post content"></textarea>
-      <button>Publish</button>
+      <p id="siteStatus"></p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Site</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="sitesTable"></tbody>
+      </table>
+    </section>
+
+    <!-- PUBLISH -->
+    <section id="publish" class="page">
+      <h1>Publish</h1>
+      <input id="post-title" type="text" placeholder="Post title">
+      <textarea id="post-content" placeholder="Post content"></textarea>
+      <button id="publishBtn">Publish</button>
+      <p id="publishStatus"></p>
     </section>
 
   </main>
