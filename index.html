@@ -4,73 +4,62 @@
   <meta charset="UTF-8">
   <title>Komando Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="app">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="logo">Komando</div>
+    <h2>Komando</h2>
     <nav>
-      <a href="#" data-page="dashboard" class="active">Dashboard</a>
-      <a href="#" data-page="sites">Sites</a>
+      <a href="#" data-page="generate" class="active">Generate</a>
       <a href="#" data-page="publish">Publish</a>
     </nav>
   </aside>
 
-  <!-- MAIN -->
   <main class="main">
 
-    <!-- DASHBOARD -->
-    <section id="dashboard" class="page active">
-      <h1>Dashboard</h1>
-      <div class="stats">
-        <div class="stat-card">Total Sites<br><strong>0</strong></div>
-        <div class="stat-card">Posts<br><strong>0</strong></div>
-        <div class="stat-card">Status<br><strong>Active</strong></div>
-      </div>
-    </section>
+    <!-- GENERATE -->
+    <section id="generate" class="page active">
+      <h1>Generate Artikel AI</h1>
 
-    <!-- SITES -->
-    <section id="sites" class="page">
-      <h1>WordPress Sites</h1>
+      <input id="baseTitle" placeholder="Judul Utama">
+      <textarea id="baseContent" placeholder="Isi / informasi dasar artikel"></textarea>
 
-      <div class="form">
-        <input id="site-name" type="text" placeholder="Site Name">
-        <input id="site-url" type="text" placeholder="WordPress URL">
-        <input id="site-user" type="text" placeholder="Username">
-        <input id="site-pass" type="password" placeholder="Application Password">
-        <button id="addSiteBtn">Add Site</button>
-      </div>
+      <label>Jumlah Artikel</label>
+      <input id="articleCount" type="number" value="3" min="1" max="10">
 
-      <p id="siteStatus"></p>
+      <button id="generateBtn">Generate Artikel</button>
 
-      <table>
-  <thead>
-    <tr>
-      <th>Site</th>
-      <th>Status</th>
-      <th>Aksi</th>
-    </tr>
-  </thead>
-  <tbody id="sitesTable"></tbody>
-</table>
+      <div id="generatedList"></div>
     </section>
 
     <!-- PUBLISH -->
     <section id="publish" class="page">
-      <h1>Publish</h1>
-      <input id="post-title" type="text" placeholder="Post title">
-      <textarea id="post-content" placeholder="Post content"></textarea>
+      <h1>Publish Artikel</h1>
+
+      <label>Pilih Site</label>
+      <select id="siteSelect"></select>
+
+      <label>Pilih Artikel</label>
+      <select id="articleSelect"></select>
+
+      <label>Kategori</label>
+      <select id="categorySelect"></select>
+
+      <label>Featured Image</label>
+      <input id="imageInput" type="file">
+
       <button id="publishBtn">Publish</button>
+
       <p id="publishStatus"></p>
     </section>
 
   </main>
+
 </div>
 
-<script src="./script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
