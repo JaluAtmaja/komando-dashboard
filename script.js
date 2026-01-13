@@ -116,3 +116,13 @@ document.getElementById("publishBtn").addEventListener("click", async () => {
  AUTO LOAD ON START
 *****************/
 loadSites();
+async function deleteSite(id) {
+  if (!confirm("Yakin ingin menghapus site ini?")) return;
+
+  await fetch(`${API}/delete-site?id=${id}`, {
+    method: "DELETE"
+  });
+
+  loadSites();
+}
+
