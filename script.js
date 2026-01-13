@@ -30,27 +30,25 @@ async function loadSites() {
   const table = document.getElementById("sitesTable");
   table.innerHTML = "";
 
-  try {
-    const res = await fetch(`${API}/sites`);
-    const sites = await res.json();
+  const res = await fetch(`${API}/sites`);
+  const sites = await res.json();
 
-    sites.forEach(site => {
-      const row = document.createElement("tr");
+  sites.forEach(site => {
+    const row = document.createElement("tr");
 
-      row.innerHTML = `
-        <td>${site.url}</td>
-        <td>Connected</td>
-      `;
+    row.innerHTML = `
+      <td>${site.url}</td>
+      <td>Connected</td>
+      <td>
+        <button onclick="deleteSite('${site.id}')">Hapus</button>
+      </td>
+    `;
 
-      table.appendChild(row);
-    });
+    table.appendChild(row);
+  });
 
-    // update dashboard count
-    document.querySelector(".stat-card strong").textContent = sites.length;
-
-  } catch (err) {
-    console.error("Gagal load sites", err);
-  }
+  // update dashboard counter
+  document.querySelector(".stat-card strong").textContent = sites.length;
 }
 
 /*****************
