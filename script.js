@@ -22,38 +22,54 @@ links.forEach(link => {
  LOAD SITES (TABLE + SELECT)
 *****************/
 async function loadSites() {
-  try {
-    const res = await fetch(`${API}/sites`);
-    const sites = await res.json();
+  const res = await fetch(`${API}/sites`);
+  const sites = await res.json();
 
-    // TABLE
-    const table = document.getElementById("sitesTable");
-    table.innerHTML = "";
+  const table = document.getElementById("sitesTable");
+  const select = document.getElementById("siteSelect");
 
-    // SELECT
-    const select = document.getElementById("siteSelect");
-    select.innerHTML = '<option value="">Pilih Site</option>';
+  table.innerHTML = "";
+  select.innerHTML = '<option value="">Pilih Site</option>';
 
-    sites.forEach(site => {
-      // table row
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${site.url}</td>
-        <td>Connected</td>
-      `;
-      table.appendChild(row);
+  sites.forEach(site => {
+    // TABLE ROW
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${site.url}</td>
+      <td>Connected</td>
+      <td>
+        <button class="delete-btn" data-id="${site.id}">
+          🗑 Hapus
+        </button>
+      </td>
+    `;
+    table.appendChild(row);
 
-      // dropdown option
-      const opt = document.createElement("option");
-      opt.value = site.id;
-      opt.textContent = site.url;
-      select.appendChild(opt);
+    // SELECT OPTION (Publish)
+    const opt = document.createElement("option");
+    opt.value = site.id;
+    opt.textContent = site.url;
+    select.appendChild(opt);
+  });
+
+  // DELETE HANDLER
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const siteId = btn.dataset.id;
+
+      if (!confirm("Hapus site ini?")) return;
+
+      await fetch(`${API}/delete-site`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ siteId })
+      });
+
+      loadSites();
     });
-
-  } catch (err) {
-    console.error("Load sites error:", err);
-  }
+  });
 }
+
 
 /*****************
  ADD SITE (API)
